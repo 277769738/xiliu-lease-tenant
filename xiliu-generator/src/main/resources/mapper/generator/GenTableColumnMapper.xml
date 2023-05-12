@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiliu.generator.mapper.GenTableColumnMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xiliu.generator.entity.GenTableColumn">
+        <id column="column_id" property="columnId" />
+        <result column="table_id" property="tableId" />
+        <result column="column_name" property="columnName" />
+        <result column="column_comment" property="columnComment" />
+        <result column="column_type" property="columnType" />
+        <result column="java_type" property="javaType" />
+        <result column="java_field" property="javaField" />
+        <result column="is_pk" property="isPk" />
+        <result column="is_increment" property="isIncrement" />
+        <result column="is_required" property="isRequired" />
+        <result column="is_insert" property="isInsert" />
+        <result column="is_edit" property="isEdit" />
+        <result column="is_list" property="isList" />
+        <result column="is_query" property="isQuery" />
+        <result column="query_type" property="queryType" />
+        <result column="html_type" property="htmlType" />
+        <result column="dict_type" property="dictType" />
+        <result column="sort" property="sort" />
+        <result column="updated_time" property="updatedTime" />
+        <result column="updated_by" property="updatedBy" />
+        <result column="created_time" property="createdTime" />
+        <result column="created_by" property="createdBy" />
+        <result column="deleted" property="deleted" />
+        <result column="version" property="version" />
+    </resultMap>
+
+    <select id="selectDbTableColumnsByName" resultMap="BaseResultMap">
+        select column_name, (case when (is_nullable = 'no' <![CDATA[ && ]]> column_key != 'PRI') then '1' else null end) as is_required, (case when column_key = 'PRI' then '1' else '0' end) as is_pk, ordinal_position as sort, column_comment, (case when extra = 'auto_increment' then '1' else '0' end) as is_increment, column_type
+		from information_schema.columns where table_schema = (select database()) and table_name = (#{tableName})
+		order by ordinal_position
+    </select>
+</mapper>

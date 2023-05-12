@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiliu.server.modules.services.mapper.XlUserProjectMapper">
+
+    <resultMap type="com.xiliu.server.modules.services.entity.XlUserProject" id="XlRoleProjectResult">
+        <result property="userProjectId"    column="user_project_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="apartmentId"    column="apartment_id"    />
+        <result property="tenantId"    column="tenant_id"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="version"    column="version"    />
+    </resultMap>
+
+</mapper>

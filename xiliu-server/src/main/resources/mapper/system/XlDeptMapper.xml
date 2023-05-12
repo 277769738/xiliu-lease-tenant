@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiliu.server.modules.system.mapper.XlDeptMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xiliu.server.modules.system.entity.XlDept">
+        <id column="dept_id" property="deptId" />
+        <result column="parent_id" property="parentId" />
+        <result column="ancestors" property="ancestors" />
+        <result column="dept_name" property="deptName" />
+        <result column="sort" property="sort" />
+        <result column="leader" property="leader" />
+        <result column="phone" property="phone" />
+        <result column="email" property="email" />
+        <result column="status" property="status" />
+        <result column="dept_level" property="deptLevel" />
+        <result column="updated_time" property="updatedTime" />
+        <result column="updated_by" property="updatedBy" />
+        <result column="created_time" property="createdTime" />
+        <result column="created_by" property="createdBy" />
+        <result column="deleted" property="deleted" />
+        <result column="version" property="version" />
+    </resultMap>
+
+    <sql id="selectDeptVo">
+        select d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.sort, d.leader, d.phone, d.email, d.status, d.dept_level, d.created_by, d.created_time
+        from xl_dept d
+    </sql>
+
+    <select id="selectDeptList" resultMap="BaseResultMap">
+        <include refid="selectDeptVo"/>
+        where d.deleted = 0
+        <if test="dept.deptId != null and dept.deptId != 0">
+            AND d.dept_id = #{dept.deptId}
+        </if>
+        <if test="dept.parentId != null and dept.parentId != 0">
+            AND d.parent_id = #{dept.parentId}
+        </if>
+        <if test="dept.deptName != null and dept.deptName != ''">
+            AND d.dept_name like concat('%', #{dept.deptName}, '%')
+        </if>
+        <if test="dept.status != null and dept.status != ''">
+            AND d.status = #{dept.status}
+        </if>
+        <!-- 数据范围过滤 -->
+        ${dept.params.dataScope}
+        order by d.parent_id, d.sort
+    </select>
+
+    <select id="selectChildrenDeptById" resultMap="BaseResultMap">
+        select * from xl_dept where deleted = 0 and find_in_set(#{deptId}, ancestors)
+    </select>
+
+    <delete id="deleteDeptByTenantId">
+        delete from xl_dept where tenant_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectDeptListByRoleId" resultType="Long">
+        select d.dept_id
+        from xl_dept d
+        left join xl_role_dept rd on d.dept_id = rd.dept_id
+        where rd.role_id = #{roleId}
+        <if test="deptCheckStrictly">
+            and d.dept_id not in (select d.parent_id from xl_dept d inner join xl_role_dept rd on d.dept_id = rd.dept_id and rd.role_id = #{roleId})
+        </if>
+        order by d.parent_id, d.sort
+    </select>
+</mapper>

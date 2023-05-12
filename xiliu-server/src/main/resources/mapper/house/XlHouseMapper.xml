@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiliu.server.modules.house.mapper.XlHouseMapper">
+
+    <resultMap type="com.xiliu.server.modules.house.entity.XlHouse" id="XlHouseResult">
+        <result property="houseId"    column="house_id"    />
+        <result property="floor"    column="floor"    />
+        <result property="houseNo"    column="house_no"    />
+        <result property="hireType"    column="hire_type"    />
+        <result property="houseType"    column="house_type"    />
+        <result property="hall"    column="hall"    />
+        <result property="room"    column="room"    />
+        <result property="toilet"    column="toilet"    />
+        <result property="area"    column="area"    />
+        <result property="orienta"    column="orienta"    />
+        <result property="state"    column="state"    />
+        <result property="money"    column="money"    />
+        <result property="deposit"    column="deposit"    />
+        <result property="realityMoney"    column="reality_money"    />
+        <result property="externalMoney"    column="external_money"    />
+        <result property="weekMoney"    column="week_money"    />
+        <result property="depositNum"    column="deposit_num"    />
+        <result property="payNum"    column="pay_num"    />
+        <result property="chargingType"    column="charging_type"    />
+        <result property="orderNo"    column="order_no"    />
+        <result property="tags"    column="tags"    />
+        <result property="apartmentId"    column="apartment_id"    />
+        <result property="tenantId"    column="tenant_id"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="version"    column="version"    />
+
+        <association property="apartment" javaType="com.xiliu.server.modules.house.entity.XlApartment">
+            <id column="apartment_id" property="apartmentId" />
+            <result column="apartment_name" property="apartmentName" />
+        </association>
+    </resultMap>
+
+    <sql id="selectXlHouseVo">
+        select h.house_id, h.floor, h.house_no, h.hire_type, h.house_type, h.hall, h.room, h.toilet, h.area, h.orienta, h.state, h.money, h.deposit, h.reality_money, h.external_money, h.week_money, h.deposit_num, h.pay_num, h.charging_type, h.order_no, h.tags,
+        h.apartment_id, h.tenant_id, a.apartment_name
+        from xl_house h
+        left join xl_apartment a on a.apartment_id = h.apartment_id and a.deleted = 0
+        left join xl_brand_classify bc on a.brand_id = bc.brand_id and bc.deleted = 0
+        left join xl_project_classify pc on a.project_id = pc.classify_id and pc.deleted = 0
+    </sql>
+
+    <select id="selectXlHouseList"  resultMap="XlHouseResult">
+        <include refid="selectXlHouseVo"/>
+        <where>
+            h.deleted = 0
+        </where>
+        <if test="brandId != null ">
+            AND a.brand_id = #{brandId}
+        </if>
+        <if test="projectId != null ">
+            AND a.project_id = #{projectId}
+        </if>
+        <if test="apartmentId != null ">
+            AND h.apartment_id = #{apartmentId}
+        </if>
+        <if test="houseType != null and houseType != ''">
+            AND h.house_type = #{houseType}
+        </if>
+        <if test="hireType != null and hireType != ''">
+            AND h.hire_type = #{hireType}
+        </if>
+        <if test="state != null ">
+            AND h.state = #{state}
+        </if>
+        <if test="houseNo != null and houseNo != ''">
+            AND h.house_no like concat('%', #{houseNo}, '%')
+        </if>
+    </select>
+
+    <select id="selectXlHouseByHouseId" parameterType="Long" resultMap="XlHouseResult">
+        <include refid="selectXlHouseVo"/>
+        where house_id = #{houseId}
+    </select>
+
+    <select id="getHouseCount" resultType="java.util.Map">
+        select count(1) zs,
+		ifnull(sum(case when state ='3' then 1 else 0 end),0) yz,
+		ifnull(sum(case when state ='1' then 1 else 0 end),0) kz,
+		ifnull(sum(case when state ='5' then 1 else 0 end),0) yd
+        from xl_house where deleted = 0 and apartment_id = #{apartmentId}
+    </select>
+
+    <select id="getCentralizeRoomList" resultType="com.xiliu.server.modules.house.vo.CentralizeRoomVo">
+        select h.apartment_id,h.house_id,h.house_no,h.floor, CONCAT(ifnull(h.room,0) ,'室' , ifnull(h.hall,0) , '厅' , ifnull(h.toilet,0), '卫') as unitType,
+            DATEDIFF(NOW(),h.created_time) as vacant_day,h.money,h.deposit,h.state,hs.front_money,hl.real_name zk, hs.real_name
+        from xl_house h
+        left join xl_house_lessee hl on h.house_id = hl.house_id and hl.lessee_status = '1' and hl.deleted = 0
+        left join xl_house_subscribe hs on h.house_id = hs.house_id and hs.deleted = 0
+        where h.deleted = 0
+        and h.apartment_id = #{apartmentId}
+    </select>
+</mapper>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiliu.server.modules.house.mapper.XlHouseFeeMapper">
+
+    <resultMap type="com.xiliu.server.modules.house.entity.XlHouseFee" id="XlHouseFeeResult">
+        <result property="feeId"    column="fee_id"    />
+        <result property="houseId"    column="house_id"    />
+        <result property="feeType"    column="fee_type"    />
+        <result property="feeDbType"    column="fee_db_type"    />
+        <result property="feeQtType"    column="fee_qt_type"    />
+        <result property="feeCollectType"    column="fee_collect_type"    />
+        <result property="feeAmount"    column="fee_amount"    />
+        <result property="apartmentId"    column="apartment_id"    />
+        <result property="tenantId"    column="tenant_id"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="version"    column="version"    />
+    </resultMap>
+
+    <sql id="selectXlHouseFeeVo">
+        select fee_id, house_id, fee_type, fee_db_type, fee_qt_type, fee_collect_type, fee_amount, apartment_id, tenant_id, updated_time, updated_by, created_time, created_by, deleted, version from xl_house_fee
+    </sql>
+
+    <select id="selectXlHouseFeeList"  resultMap="XlHouseFeeResult">
+        <include refid="selectXlHouseFeeVo"/>
+        <where>
+            deleted = 0
+        </where>
+    </select>
+
+    <select id="selectXlHouseFeeByFeeId" parameterType="Long" resultMap="XlHouseFeeResult">
+        <include refid="selectXlHouseFeeVo"/>
+        where fee_id = #{feeId}
+    </select>
+
+
+</mapper>

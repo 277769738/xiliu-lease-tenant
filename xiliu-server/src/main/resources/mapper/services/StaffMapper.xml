@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiliu.server.modules.services.mapper.StaffMapper">
+
+    <select id="getStaffList" resultType="com.xiliu.server.modules.services.vo.StaffResultVo">
+        select u.user_id, u.real_name, u.user_code, u.pass_word,u.mobile, u.status,u.created_time, r.role_id, r.role_name, r.role_key,
+        r.description
+        from xl_user u
+        left join xl_user_role ur on u.user_id = ur.user_id and ur.deleted = 0
+        left join xl_role r on r.role_id = ur.role_id and r.deleted = 0
+        where u.deleted = 0 and r.role_key != 'admin'
+        <if test="query.userCode != null and query.userCode != ''">
+            AND u.user_code like concat('%', #{query.userCode}, '%')
+        </if>
+        <if test="query.roleId != null ">
+            AND r.role_id = #{query.roleId}
+        </if>
+        <if test="query.description != null and query.description != ''">
+            AND r.description = #{query.description}
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiliu.server.modules.system.mapper.XlOperLogMapper">
+    
+    <resultMap type="com.xiliu.server.modules.system.entity.XlOperLog" id="XlOperLogResult">
+        <result property="operId"    column="oper_id"    />
+        <result property="title"    column="title"    />
+        <result property="businessType"    column="business_type"    />
+        <result property="method"    column="method"    />
+        <result property="requestMethod"    column="request_method"    />
+        <result property="operatorType"    column="operator_type"    />
+        <result property="operName"    column="oper_name"    />
+        <result property="operUrl"    column="oper_url"    />
+        <result property="operIp"    column="oper_ip"    />
+        <result property="operLocation"    column="oper_location"    />
+        <result property="operParam"    column="oper_param"    />
+        <result property="jsonResult"    column="json_result"    />
+        <result property="status"    column="status"    />
+        <result property="errorMsg"    column="error_msg"    />
+        <result property="operTime"    column="oper_time"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="version"    column="version"    />
+    </resultMap>
+
+    <sql id="selectXlOperLogVo">
+        select oper_id, title, business_type, method, request_method, operator_type, oper_name, oper_url, oper_ip, oper_location, oper_param, json_result, status, error_msg, oper_time, dept_name, dept_id, updated_time, updated_by, created_time, created_by, deleted, version from xl_oper_log
+    </sql>
+
+    <select id="selectXlOperLogList" resultMap="XlOperLogResult">
+        <include refid="selectXlOperLogVo"/>
+        <where>
+            deleted = 0
+        </where>
+        <if test="title != null and title != ''">
+            AND title like concat('%', #{title}, '%')
+        </if>
+        <if test="businessType != null ">
+            AND business_type = #{businessType}
+        </if>
+        <if test="businessTypes != null and businessTypes.length > 0">
+            AND business_type in
+            <foreach collection="businessTypes" item="businessType" open="(" separator="," close=")">
+                #{businessType}
+            </foreach>
+        </if>
+        <if test="operName != null and operName != ''">
+            AND oper_name like concat('%', #{operName}, '%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and date_format(oper_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date_format(oper_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+        </if>
+    </select>
+    
+    <select id="selectXlOperLogByOperId" parameterType="Long" resultMap="XlOperLogResult">
+
+    </select>
+        
+
+</mapper>

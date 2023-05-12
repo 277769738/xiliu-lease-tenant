@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.4</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <groupId>com.java.xiliu</groupId>
+    <artifactId>xiliu-lease-tenant</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>xiliu-common</module>
+        <module>xiliu-generator</module>
+        <module>xiliu-server</module>
+
+    </modules>
+
+    <!--定义相关属性，使用${属性名}的方式引用该属性-->
+    <properties>
+        <java.version>1.8</java.version>
+        <!--mybatis-plus-->
+        <mybatis-plus.version>3.5.1</mybatis-plus.version>
+        <!--分页插件版本-->
+        <pagehelper.version>1.4.1</pagehelper.version>
+        <!-- swagger -->
+        <swagger.version>2.0.7</swagger.version>
+        <!--JWT(Json Web Token)登录支持-->
+        <jwt.version>0.9.0</jwt.version>
+        <transmittable-thread-local.version>2.13.2</transmittable-thread-local.version>
+        <!-- hutool 工具库-->
+        <hutool.version>5.8.11</hutool.version>
+        <!-- druid连接池 -->
+        <druid-version>1.1.21</druid-version>
+        <!-- io常用工具类 -->
+        <commom-io.version>2.11.0</commom-io.version>
+        <!-- 阿里JSON解析器 -->
+        <fastjson2-version>2.0.8</fastjson2-version>
+        <!-- velocity 模板引擎 -->
+        <velocity-version>2.1</velocity-version>
+        <!-- 获取系统信息 -->
+        <oshi-version>6.1.6</oshi-version>
+        <!-- easyexcel -->
+        <easyexcel.version>3.2.0</easyexcel.version>
+        <!--腾讯云 COS 对象存储-->
+        <cos-version>5.6.89</cos-version>
+        <!--腾讯云 COS 临时密钥-->
+        <cos_sts-version>3.1.1</cos_sts-version>
+        <xiliu-common.version>1.0-SNAPSHOT</xiliu-common.version>
+        <xiliu-generator.version>1.0-SNAPSHOT</xiliu-generator.version>
+        <xiliu-server.version>1.0-SNAPSHOT</xiliu-server.version>
+    </properties>
+
+    <!-- 依赖声明 -->
+    <dependencyManagement>
+        <dependencies>
+            <!--mybatis-plus-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <!-- pagehelper 分页插件 -->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper.version}</version>
+            </dependency>
+            <!-- hutool 工具类库 -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+            <!-- druid连接池 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid-version}</version>
+            </dependency>
+            <!--swagger-->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-spring-boot-starter</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
+            <!--JWT(Json Web Token)登录支持-->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jwt.version}</version>
+            </dependency>
+            <!-- 线程传递值 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>transmittable-thread-local</artifactId>
+                <version>${transmittable-thread-local.version}</version>
+            </dependency>
+            <!-- io常用工具类 -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commom-io.version}</version>
+            </dependency>
+            <!-- 阿里JSON解析器 -->
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2-version}</version>
+            </dependency>
+            <!-- velocity 模板引擎, Mybatis Plus 代码生成器需要 -->
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity-engine-core</artifactId>
+                <version>${velocity-version}</version>
+            </dependency>
+            <!-- 获取系统信息 -->
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshi-version}</version>
+            </dependency>
+            <!-- easyexcel -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>easyexcel</artifactId>
+                <version>${easyexcel.version}</version>
+            </dependency>
+            <!--腾讯云 COS 对象存储-->
+            <dependency>
+                <groupId>com.qcloud</groupId>
+                <artifactId>cos_api</artifactId>
+                <version>${cos-version}</version>
+            </dependency>
+            <!--腾讯云 COS 临时密钥-->
+            <dependency>
+                <groupId>com.qcloud</groupId>
+                <artifactId>cos-sts_api</artifactId>
+                <version>${cos_sts-version}</version>
+            </dependency>
+            <!--通用模块-->
+            <dependency>
+                <groupId>com.java.xiliu</groupId>
+                <artifactId>xiliu-common</artifactId>
+                <version>${xiliu-common.version}</version>
+            </dependency>
+            <!--代码生成模块-->
+            <dependency>
+                <groupId>com.java.xiliu</groupId>
+                <artifactId>xiliu-generator</artifactId>
+                <version>${xiliu-generator.version}</version>
+            </dependency>
+            <!--服务模块-->
+            <dependency>
+                <groupId>com.java.xiliu</groupId>
+                <artifactId>xiliu-server</artifactId>
+                <version>${xiliu-server.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

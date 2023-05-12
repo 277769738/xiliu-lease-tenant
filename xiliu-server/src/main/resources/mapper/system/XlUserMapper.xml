@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiliu.server.modules.system.mapper.XlUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xiliu.server.modules.system.entity.XlUser">
+        <id column="user_id" property="userId" />
+        <result column="user_code" property="userCode" />
+        <result column="pass_word" property="passWord" />
+        <result column="real_name" property="realName" />
+        <result column="user_nickname" property="userNickname" />
+        <result column="user_email" property="userEmail"/>
+        <result column="status" property="status" />
+        <result column="sex" property="sex" />
+        <result column="mobile" property="mobile" />
+        <result column="dept_id" property="deptId" />
+        <result column="tenant_id" property="tenantId" />
+        <result column="entry_date" property="entryDate" />
+        <result column="user_number" property="userNumber" />
+        <result column="id_no" property="idNo" />
+        <result column="updated_time" property="updatedTime" />
+        <result column="updated_by" property="updatedBy" />
+        <result column="created_time" property="createdTime" />
+        <result column="created_by" property="createdBy" />
+        <result column="deleted" property="deleted" />
+        <result column="version" property="version" />
+
+        <association property="dept" javaType="com.xiliu.server.modules.system.entity.XlDept">
+            <id column="dept_id" property="deptId" />
+            <result column="dept_name" property="deptName" />
+            <result column="leader" property="leader" />
+        </association>
+
+        <collection property="roles" javaType="java.util.List" ofType="com.xiliu.server.modules.system.entity.XlRole">
+            <id column="role_id" property="roleId" />
+            <result column="role_name" property="roleName" />
+            <result column="role_key" property="roleKey" />
+            <result column="data_scope" property="dataScope" />
+        </collection>
+    </resultMap>
+
+    <sql id="selectUserVo">
+        select u.user_id, u.real_name, u.user_nickname, u.user_email, u.avatar,u.user_code, u.pass_word,u.sex,
+        u.mobile, u.status,u.created_time,u.dept_id,u.tenant_id,d.dept_name, r.role_id, r.role_name, r.role_key,
+        r.data_scope, r.status as role_status, u.entry_date, u.user_number, u.id_no
+        from xl_user u
+        left join xl_user_role ur on u.user_id = ur.user_id and ur.deleted = 0
+        left join xl_role r on r.role_id = ur.role_id and r.deleted = 0
+        left join xl_dept d on u.dept_id = d.dept_id and d.deleted = 0
+    </sql>
+
+    <select id="selectUserById" resultMap="BaseResultMap">
+        <include refid="selectUserVo"/>
+        where u.deleted = 0
+        and u.user_id = #{userId}
+    </select>
+
+    <select id="selectUserList" resultMap="BaseResultMap">
+        select u.user_id, u.real_name, u.user_nickname, u.user_email, u.avatar,u.user_code, u.pass_word,u.sex,
+        u.mobile, u.status,u.dept_id,u.created_time, d.dept_name, d.leader
+        from xl_user u
+		left join xl_dept d on u.dept_id = d.dept_id and d.deleted = 0
+		where u.deleted = 0
+        <if test="user.userId != null and user.userId != 0">
+            AND u.user_id = #{user.userId}
+        </if>
+        <if test="user.userCode != null and user.userCode != ''">
+            AND u.user_code like concat('%', #{user.userCode}, '%')
+        </if>
+        <if test="user.realName != null and user.realName != ''">
+            AND u.real_name like concat('%', #{user.realName}, '%')
+        </if>
+    </select>
+
+    <select id="selectUserByUserName" resultMap="BaseResultMap">
+        <include refid="selectUserVo"/>
+        where u.user_code = #{userName} and u.deleted = 0
+    </select>
+
+    <select id="checkUserNameUnique" parameterType="String" resultType="int">
+        select count(1) from xl_user where user_code = #{userName} and deleted = 0 limit 1
+    </select>
+
+    <delete id="deleteUserByTenantId">
+        delete from xl_user where tenant_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectAllocatedList"  resultType="com.xiliu.server.modules.system.vo.RoleUserResultVo">
+        select distinct u.user_id, u.dept_id, u.user_code, u.real_name, u.user_email, u.mobile, u.status, u.created_time
+        from xl_user u
+        left join xl_dept d on u.dept_id = d.dept_id
+        left join xl_user_role ur on u.user_id = ur.user_id
+        left join xl_role r on r.role_id = ur.role_id
+        where u.deleted = 0 and r.role_id = #{query.roleId}
+        <if test="query.userCode != null and query.userCode != ''">
+            AND u.user_code like concat('%', #{query.userCode}, '%')
+        </if>
+        <if test="query.mobile != null and query.mobile != ''">
+            AND u.mobile like concat('%', #{query.mobile}, '%')
+        </if>
+        <!-- 数据范围过滤 -->
+        ${query.params.dataScope}
+    </select>
+
+    <select id="selectUnallocatedList"  resultType="com.xiliu.server.modules.system.vo.RoleUserResultVo">
+        select distinct u.user_id, u.dept_id, u.user_code, u.real_name, u.user_email, u.mobile, u.status, u.created_time
+        from xl_user u
+        left join xl_dept d on u.dept_id = d.dept_id
+        left join xl_user_role ur on u.user_id = ur.user_id
+        left join xl_role r on r.role_id = ur.role_id
+        where u.deleted = 0 and (r.role_id != #{query.roleId} or r.role_id IS NULL)
+        and u.user_id not in (select u.user_id from xl_user u inner join xl_user_role ur on u.user_id = ur.user_id and ur.role_id = #{query.roleId})
+        <if test="query.userCode != null and query.userCode != ''">
+            AND u.user_code like concat('%', #{query.userCode}, '%')
+        </if>
+        <if test="query.mobile != null and query.mobile != ''">
+            AND u.mobile like concat('%', #{query.mobile}, '%')
+        </if>
+        <!-- 数据范围过滤 -->
+        ${query.params.dataScope}
+    </select>
+
+</mapper>

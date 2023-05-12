@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xiliu.generator.mapper.GenTableMapper">
+
+    <resultMap id="BaseResultMap" type="com.xiliu.generator.entity.GenTable">
+        <id     property="tableId"        column="table_id"          />
+        <result property="tableName"      column="table_name"        />
+        <result property="tableComment"   column="table_comment"     />
+        <result property="subTableName"   column="sub_table_name"    />
+        <result property="subTableFkName" column="sub_table_fk_name" />
+        <result property="className"      column="class_name"        />
+        <result property="tplCategory"    column="tpl_category"      />
+        <result property="packageName"    column="package_name"      />
+        <result property="moduleName"     column="module_name"       />
+        <result property="businessName"   column="business_name"     />
+        <result property="functionName"   column="function_name"     />
+        <result property="functionAuthor" column="function_author"   />
+        <result property="genType"        column="gen_type"          />
+        <result property="genPath"        column="gen_path"          />
+        <result property="options"        column="options"           />
+        <result column="updated_time" property="updatedTime" />
+        <result column="updated_by" property="updatedBy" />
+        <result column="created_time" property="createdTime" />
+        <result column="created_by" property="createdBy" />
+        <result column="deleted" property="deleted" />
+
+        <collection  property="columns"  javaType="java.util.List"  ofType="com.xiliu.generator.entity.GenTableColumn" >
+            <id     property="columnId"       column="column_id"      />
+            <result property="tableId"        column="table_id"       />
+            <result property="columnName"     column="column_name"    />
+            <result property="columnComment"  column="column_comment" />
+            <result column="java_type" property="javaType" />
+            <result column="java_field" property="javaField" />
+            <result column="is_pk" property="isPk" />
+            <result column="is_increment" property="isIncrement" />
+            <result column="is_required" property="isRequired" />
+            <result column="is_insert" property="isInsert" />
+            <result column="is_edit" property="isEdit" />
+            <result column="is_list" property="isList" />
+            <result column="is_query" property="isQuery" />
+            <result column="query_type" property="queryType" />
+            <result column="html_type" property="htmlType" />
+            <result column="dict_type" property="dictType" />
+            <result column="sort" property="sort" />
+        </collection>
+    </resultMap>
+
+    <sql id="selectGenTableVo">
+        select table_id, table_name, table_comment, sub_table_name, sub_table_fk_name, class_name, tpl_category, package_name, module_name, business_name, function_name, function_author, gen_type, gen_path, options, created_by, created_time, updated_by, updated_time from gen_table
+    </sql>
+
+    <select id="selectDbTableList" resultMap="BaseResultMap">
+        select table_name, table_comment, create_time, update_time from information_schema.tables
+        where table_schema = (select database())
+        AND table_name NOT LIKE 'qrtz_%' AND table_name NOT LIKE 'gen_%'
+        AND table_name NOT IN (select table_name from gen_table where deleted = 0)
+        <if test="genTable.tableName != null and genTable.tableName != ''">
+            AND lower(table_name) like lower(concat('%', #{genTable.tableName}, '%'))
+        </if>
+        <if test="genTable.tableComment != null and genTable.tableComment != ''">
+            AND lower(table_comment) like lower(concat('%', #{genTable.tableComment}, '%'))
+        </if>
+        <if test="genTable.beginTime != null and genTable.beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(create_time,'%y%m%d') &gt;= date_format(#{genTable.beginTime},'%y%m%d')
+        </if>
+        <if test="genTable.endTime != null and genTable.endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(create_time,'%y%m%d') &lt;= date_format(#{genTable.endTime},'%y%m%d')
+        </if>
+        order by create_time desc
+    </select>
+
+    <select id="selectDbTableListByNames" resultMap="BaseResultMap">
+        select table_name, table_comment, create_time, update_time from information_schema.tables
+        where table_name NOT LIKE 'qrtz_%' and table_name NOT LIKE 'gen_%' and table_schema = (select database())
+        and table_name in
+        <foreach collection="array" item="name" open="(" separator="," close=")">
+            #{name}
+        </foreach>
+    </select>
+
+    <select id="selectGenTableList" resultMap="BaseResultMap">
+        <include refid="selectGenTableVo"/>
+        where deleted = 0
+        <if test="genTable.tableName != null and genTable.tableName != ''">
+            AND lower(table_name) like lower(concat('%', #{genTable.tableName}, '%'))
+        </if>
+        <if test="genTable.tableComment != null and genTable.tableComment != ''">
+            AND lower(table_comment) like lower(concat('%', #{genTable.tableComment}, '%'))
+        </if>
+        <if test="genTable.beginTime != null and genTable.beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(created_time,'%y%m%d') &gt;= date_format(#{genTable.beginTime},'%y%m%d')
+        </if>
+        <if test="genTable.endTime != null and genTable.endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(created_time,'%y%m%d') &lt;= date_format(#{genTable.endTime},'%y%m%d')
+        </if>
+        order by created_time desc
+    </select>
+    
+    <select id="selectGenTableById" resultMap="BaseResultMap">
+        SELECT t.table_id, t.table_name, t.table_comment, t.sub_table_name, t.sub_table_fk_name, t.class_name, t.tpl_category, t.package_name, t.module_name, t.business_name, t.function_name, t.function_author, t.gen_type, t.gen_path, t.options,
+			   c.column_id, c.column_name, c.column_comment, c.column_type, c.java_type, c.java_field, c.is_pk, c.is_increment, c.is_required, c.is_insert, c.is_edit, c.is_list, c.is_query, c.query_type, c.html_type, c.dict_type, c.sort
+		FROM gen_table t
+         LEFT JOIN gen_table_column c ON t.table_id = c.table_id and c.deleted = 0
+		where t.deleted = 0 and t.table_id = #{tableId} order by c.sort
+    </select>
+
+    <select id="selectGenTableByName" resultMap="BaseResultMap">
+        SELECT t.table_id, t.table_name, t.table_comment, t.sub_table_name, t.sub_table_fk_name, t.class_name, t.tpl_category, t.package_name, t.module_name, t.business_name, t.function_name, t.function_author, t.gen_type, t.gen_path, t.options,
+        c.column_id, c.column_name, c.column_comment, c.column_type, c.java_type, c.java_field, c.is_pk, c.is_increment, c.is_required, c.is_insert, c.is_edit, c.is_list, c.is_query, c.query_type, c.html_type, c.dict_type, c.sort
+        FROM gen_table t
+        LEFT JOIN gen_table_column c ON t.table_id = c.table_id and c.deleted = 0
+        where t.deleted = 0 and t.table_name = #{tableName} order by c.sort
+    </select>
+</mapper>

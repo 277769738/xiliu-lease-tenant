@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiliu.server.modules.house.mapper.XlApartmentMapper">
+    
+    <resultMap type="com.xiliu.server.modules.house.entity.XlApartment" id="XlApartmentResult">
+        <result property="apartmentId"    column="apartment_id"    />
+        <result property="apartmentName"    column="apartment_name"    />
+        <result property="apartmentType"    column="apartment_type"    />
+        <result property="brandId"    column="brand_id"    />
+        <result property="projectId"    column="project_id"    />
+        <result property="province"    column="province"    />
+        <result property="city"    column="city"    />
+        <result property="county"    column="county"    />
+        <result property="detailAddress"    column="detail_address"    />
+        <result property="floorNum"    column="floor_num"    />
+        <result property="houseNum"    column="house_num"    />
+        <result property="isLift"    column="is_lift"    />
+        <result property="contact"    column="contact"    />
+        <result property="contactNumber"    column="contact_number"    />
+        <result property="lng"    column="lng"    />
+        <result property="lat"    column="lat"    />
+        <result property="mapAddress"    column="map_address"    />
+        <result property="remarks"    column="remarks"    />
+        <result property="apartmentStatus"    column="apartment_status"    />
+        <result property="apartmentLogo"    column="apartment_logo"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="coverImg"    column="cover_img"    />
+        <result property="firstPartyName"    column="first_party_name"    />
+        <result property="firstPartyPhone"    column="first_party_phone"    />
+        <result property="firstPartyAddress"    column="first_party_address"    />
+        <result property="tenantId"    column="tenant_id"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="version"    column="version"    />
+
+        <association property="brand" javaType="com.xiliu.server.modules.house.entity.XlBrandClassify">
+            <id column="brand_id" property="brandId" />
+            <result column="brand_name" property="brandName" />
+        </association>
+
+        <association property="project" javaType="com.xiliu.server.modules.house.entity.XlProjectClassify">
+            <id column="classify_id" property="classifyId" />
+            <result column="classify_name" property="classifyName" />
+        </association>
+    </resultMap>
+
+    <sql id="selectApartmentVo">
+        select apartment_id, apartment_name, apartment_type, brand_id, project_id, province, city, county, detail_address, floor_num, house_num, is_lift, contact, contact_number, lng, lat, map_address, remarks, apartment_status, apartment_logo, sort_order, cover_img, first_party_name, first_party_phone, first_party_address, tenant_id, updated_time, updated_by, created_time, created_by, deleted, version from xl_apartment
+    </sql>
+
+    <sql id="selectXlApartmentVo">
+        select a.apartment_id, a.apartment_name, a.apartment_type, a.brand_id, bc.brand_name,a.project_id, pc.classify_name,
+        a.province, a.city, a.county, a.detail_address,a.created_time, a.floor_num, a.house_num, a.is_lift, a.contact, a.contact_number,
+        a.lng, a.lat, a.remarks
+        from xl_apartment a
+        left join xl_brand_classify bc on a.brand_id = bc.brand_id and bc.deleted = 0
+        left join xl_project_classify pc on a.project_id = pc.classify_id and pc.deleted = 0
+    </sql>
+
+    <select id="selectXlApartmentList"  resultMap="XlApartmentResult">
+        <include refid="selectXlApartmentVo"/>
+        <where>
+            a.deleted = 0
+        </where>
+        <if test="brandId != null ">
+            AND a.brand_id = #{brandId}
+        </if>
+        <if test="projectId != null ">
+            AND a.project_id = #{projectId}
+        </if>
+        <if test="apartmentName != null and apartmentName != ''">
+            AND a.apartment_name like concat('%', #{apartmentName}, '%')
+        </if>
+    </select>
+    
+    <select id="selectXlApartmentByApartmentId" parameterType="Long" resultMap="XlApartmentResult">
+        <include refid="selectXlApartmentVo"/>
+        where a.apartment_id = #{apartmentId}
+    </select>
+
+    <select id="getUserApartmentList"  resultType="com.xiliu.server.modules.house.vo.ApartmentSimpleVo">
+        select a.apartment_id, a.apartment_name,a.brand_id, bc.brand_name,a.project_id, pc.classify_name
+        from xl_apartment a
+        left join xl_user_project up on a.apartment_id = up.apartment_id and up.deleted = 0
+        left join xl_brand_classify bc on a.brand_id = bc.brand_id and bc.deleted = 0
+        left join xl_project_classify pc on a.project_id = pc.classify_id and pc.deleted = 0
+        where a.deleted = 0
+        <if test="userId != null ">
+            AND up.user_id = #{userId}
+        </if>
+    </select>
+</mapper>

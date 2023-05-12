@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiliu.server.modules.house.mapper.XlBrandClassifyMapper">
+    
+    <resultMap type="com.xiliu.server.modules.house.entity.XlBrandClassify" id="XlBrandClassifyResult">
+        <result property="brandId"    column="brand_id"    />
+        <result property="brandName"    column="brand_name"    />
+        <result property="remarks"    column="remarks"    />
+        <result property="apartmentId"    column="apartment_id"    />
+        <result property="tenantId"    column="tenant_id"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="version"    column="version"    />
+    </resultMap>
+
+    <sql id="selectXlBrandClassifyVo">
+        select brand_id, brand_name, remarks, apartment_id, tenant_id, updated_time, updated_by, created_time, created_by, deleted, version from xl_brand_classify
+    </sql>
+
+    <select id="selectXlBrandClassifyList"  resultMap="XlBrandClassifyResult">
+        <include refid="selectXlBrandClassifyVo"/>
+        <where>
+            deleted = 0
+        </where>
+        <if test="brandName != null and brandName != ''">
+            AND brand_name like concat('%', #{brandName}, '%')
+        </if>
+    </select>
+    
+    <select id="selectXlBrandClassifyByBrandId" parameterType="Long" resultMap="XlBrandClassifyResult">
+        <include refid="selectXlBrandClassifyVo"/>
+        where brand_id = #{brandId}
+    </select>
+        
+
+</mapper>

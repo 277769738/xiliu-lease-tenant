@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiliu.server.modules.system.mapper.XlRoleDeptMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.xiliu.server.modules.system.entity.XlRoleDept">
+        <id column="role_dept_id" property="roleDeptId" />
+        <result column="role_id" property="roleId" />
+        <result column="dept_id" property="deptId" />
+        <result column="tenant_id" property="tenantId" />
+        <result column="updated_time" property="updatedTime" />
+        <result column="updated_by" property="updatedBy" />
+        <result column="created_time" property="createdTime" />
+        <result column="created_by" property="createdBy" />
+        <result column="deleted" property="deleted" />
+        <result column="version" property="version" />
+    </resultMap>
+
+    <delete id="deleteRoleDeptByTenantId">
+        delete from xl_role_dept where tenant_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteRoleDeptByRoleId" parameterType="Long">
+        delete from xl_role_dept where role_id = #{roleId}
+    </delete>
+
+    <insert id="batchRoleDept">
+        insert into xl_role_dept(role_id, dept_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.roleId},#{item.deptId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteRoleDept" parameterType="Long">
+        delete from xl_role_dept where role_id in
+        <foreach collection="array" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+</mapper>

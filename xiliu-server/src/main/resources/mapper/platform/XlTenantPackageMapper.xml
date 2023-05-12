@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiliu.server.modules.platform.mapper.XlTenantPackageMapper">
+    
+    <resultMap type="com.xiliu.server.modules.platform.entity.XlTenantPackage" id="XlTenantPackageResult">
+        <result property="packageId"    column="package_id"    />
+        <result property="packageName"    column="package_name"    />
+        <result property="menuIds"    column="menu_ids"    />
+        <result property="status"    column="status"    />
+        <result property="remarks"    column="remarks"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="version"    column="version"    />
+    </resultMap>
+
+    <sql id="selectXlTenantPackageVo">
+        select package_id, package_name, menu_ids, status, remarks, updated_time, updated_by, created_time, created_by, deleted, version from xl_tenant_package
+    </sql>
+
+    <select id="selectXlTenantPackageList"  resultMap="XlTenantPackageResult">
+        <include refid="selectXlTenantPackageVo"/>
+        <where>
+            deleted = 0
+        </where>
+        <if test="packageName != null and packageName != ''">
+            AND package_name like concat('%', #{packageName}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+    </select>
+    
+    <select id="selectXlTenantPackageByPackageId" parameterType="Long" resultMap="XlTenantPackageResult">
+        <include refid="selectXlTenantPackageVo"/>
+        where package_id = #{packageId}
+    </select>
+
+    <select id="getSimpleList" resultType="com.xiliu.server.modules.platform.vo.SimplePackage">
+        select package_id id, package_name name
+        from xl_tenant_package
+        where deleted = 0 and status = '0'
+    </select>
+
+</mapper>

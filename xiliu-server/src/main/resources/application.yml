@@ -1,0 +1,5 @@
+server:
+  port: 7004
+spring:
+  profiles:
+    active: dev

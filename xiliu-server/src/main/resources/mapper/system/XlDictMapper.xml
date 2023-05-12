@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiliu.server.modules.system.mapper.XlDictMapper">
+    
+    <resultMap type="com.xiliu.server.modules.system.entity.XlDict" id="XlDictResult">
+        <result property="dictId"    column="dict_id"    />
+        <result property="dictType"    column="dict_type"    />
+        <result property="dictName"    column="dict_name"    />
+        <result property="status"    column="status"    />
+        <result property="remark"    column="remark"    />
+        <result property="updatedTime"    column="updated_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="version"    column="version"    />
+    </resultMap>
+
+    <sql id="selectXlDictVo">
+        select dict_id, dict_type, dict_name, status, remark, updated_time, updated_by, created_time, created_by, deleted, version from xl_dict
+    </sql>
+
+    <select id="selectXlDictList"  resultMap="XlDictResult">
+        <include refid="selectXlDictVo"/>
+        where deleted = 0
+        <if test="xlDict.dictName != null and xlDict.dictName != ''">
+            AND dict_name like concat('%', #{xlDict.dictName}, '%')
+        </if>
+        <if test="xlDict.dictType != null and xlDict.dictType != ''">
+            AND dict_type = #{xlDict.dictType}
+        </if>
+        <if test="xlDict.status != null and xlDict.status != ''">
+            AND status = #{xlDict.status}
+        </if>
+        <if test="xlDict.beginTime != null and xlDict.beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(created_time,'%y%m%d') &gt;= date_format(#{xlDict.beginTime},'%y%m%d')
+        </if>
+        <if test="xlDict.endTime != null and xlDict.endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(created_time,'%y%m%d') &lt;= date_format(#{xlDict.endTime},'%y%m%d')
+        </if>
+    </select>
+    
+    <select id="selectXlDictByDictId" parameterType="Long" resultMap="XlDictResult">
+        <include refid="selectXlDictVo"/>
+        where dict_id = #{dictId}
+    </select>
+        
+
+</mapper>

@@ -1,0 +1,115 @@
+package ${packageName}.controller;
+
+import com.xiliu.common.controller.BaseController;
+import com.xiliu.common.enums.BusinessType;
+import com.xiliu.common.result.R;
+import java.util.List;
+import javax.servlet.http.HttpServletResponse;
+import com.xiliu.common.annotation.Log;
+import com.xiliu.server.utils.ExcelUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ${packageName}.entity.${ClassName};
+import ${packageName}.service.I${ClassName}Service;
+#if($table.crud || $table.sub)
+import com.xiliu.common.page.TableDataInfo;
+
+#elseif($table.tree)
+#end
+
+/**
+ * ${functionName}Controller
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+@RestController
+@RequestMapping("/${moduleName}/${businessName}")
+public class ${ClassName}Controller extends BaseController {
+    @Autowired
+    private I${ClassName}Service ${className}Service;
+
+    /**
+     * 查询${functionName}列表
+     */
+    @PreAuthorize("@customSs.hasPermi('${permissionPrefix}:list')")
+    @GetMapping("/list")
+#if($table.crud || $table.sub)
+    public TableDataInfo list(${ClassName} ${className}) {
+        startPage();
+        List<${ClassName}> list = ${className}Service.select${ClassName}List(${className});
+        return getDataTable(list);
+    }
+#elseif($table.tree)
+    public R list(${ClassName} ${className}) {
+        List<${ClassName}> list = ${className}Service.select${ClassName}List(${className});
+        return R.ok(list);
+    }
+#end
+
+    /**
+     * 导出${functionName}列表
+     */
+    @PreAuthorize("@customSs.hasPermi('${permissionPrefix}:export')")
+    @Log(title = "${functionName}", businessType = BusinessType.EXPORT)
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, ${ClassName} ${className}) {
+        List<${ClassName}> list = ${className}Service.select${ClassName}List(${className});
+        ExcelUtils.exportEasyExcel(response,${ClassName}.class,list,"${functionName}数据");
+    }
+
+    /**
+     * 获取${functionName}详细信息
+     */
+    @PreAuthorize("@customSs.hasPermi('${permissionPrefix}:query')")
+    @GetMapping(value = "/{${pkColumn.javaField}}")
+    public R getInfo(@PathVariable("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField}) {
+        return R.ok(${className}Service.select${ClassName}By${pkColumn.capJavaField}(${pkColumn.javaField}));
+    }
+
+    /**
+     * 新增${functionName}
+     */
+    @PreAuthorize("@customSs.hasPermi('${permissionPrefix}:create')")
+    @Log(title = "${functionName}", businessType = BusinessType.INSERT)
+    @PostMapping("/create")
+    public R create(@RequestBody ${ClassName} ${className}) {
+        boolean success = ${className}Service.create(${className});
+        if (success) {
+            return R.ok();
+        }
+        return R.error("添加失败");
+    }
+
+    /**
+     * 修改${functionName}
+     */
+    @PreAuthorize("@customSs.hasPermi('${permissionPrefix}:edit')")
+    @Log(title = "${functionName}", businessType = BusinessType.UPDATE)
+    @PostMapping(value = "/update/{${pkColumn.javaField}}")
+    public R update(@PathVariable ${pkColumn.javaType} ${pkColumn.javaField},  @RequestBody ${ClassName} ${className}) {
+        ${className}.set${pkColumn.javaField}(${pkColumn.javaField});
+        boolean success = ${className}Service.update(${className});
+        if (success) {
+            return R.ok();
+        }
+        return R.error("修改失败");
+    }
+
+    /**
+     * 删除${functionName}
+     */
+    @PreAuthorize("@customSs.hasPermi('${permissionPrefix}:remove')")
+    @Log(title = "${functionName}", businessType = BusinessType.DELETE)
+	@DeleteMapping("/{${pkColumn.javaField}s}")
+    public R remove(@PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s) {
+        return R.ok(${className}Service.delete${ClassName}By${pkColumn.capJavaField}s(${pkColumn.javaField}s));
+    }
+}
