@@ -29,7 +29,35 @@ xiliu-lease-tenant 是基于[xiliu-tenant](https://gitee.com/huoqstudy/xiliu-ten
 
 > 3、由于本人的精力有限，还有很多地方没法完善，如有感兴趣的朋友，欢迎加入一起完善，共同进步！
 
+## 项目演示
 
+* 在线体验：[https://lms.xiliu.online](https://lms.xiliu.online)
+* 本地体验：http://localhost:9528
+* 平台管理员：admin/123456
+* 租户1管理员：yz_admin/123456
+* 租户2管理员：test_admin/123456
+
+## 系统效果图展示
+
+![登录页](doc/image/1.jpg)
+
+![输入图片说明](doc/image/2.png)
+
+![输入图片说明](doc/image/3.png)
+
+![输入图片说明](doc/image/4.jpg)
+
+![输入图片说明](doc/image/5.jpg)
+
+![输入图片说明](doc/image/6.jpg)
+
+![输入图片说明](doc/image/7.png)
+
+![输入图片说明](doc/image/8.png)
+
+![输入图片说明](doc/image/9.png)
+
+![输入图片说明](doc/image/10.png)
 
 ## 项目结构树
 ````
@@ -147,40 +175,13 @@ easyexcel| 2.2.6| 简化导入导出工具
 14|房屋管理|添加、导入房源等相关信息。
 
 ## 本地部署
-进入 xiliu-server 模块，运行 XiliuLeaseServerApplication 类，即可启动
+- （1） 中间件安装：MySQL 和 Redis 必装
+- （2） 数据库创建和数据初始化：进入 docs 目录 ， 执行 xiliu-lease-tenant.sql，完成数据表的创建和数据初始化；
+- （3） 进入 xiliu-server 模块，运行 XiliuLeaseServerApplication 类，即可启动
 
 
 ## linux部署
 
-
-
-## 项目演示
-
-* 在线体验：[https://lms.xiliu.online](https://lms.xiliu.online)
-* 本地体验：http://localhost:9528
-* 账号密码：admin/123456
-
-## 系统效果图展示
-
-![登录页](doc/image/1.jpg)
-
-![输入图片说明](doc/image/2.png)
-
-![输入图片说明](doc/image/3.png)
-
-![输入图片说明](doc/image/4.jpg)
-
-![输入图片说明](doc/image/5.jpg)
-
-![输入图片说明](doc/image/6.jpg)
-
-![输入图片说明](doc/image/7.png)
-
-![输入图片说明](doc/image/8.png)
-
-![输入图片说明](doc/image/9.png)
-
-![输入图片说明](doc/image/10.png)
 
 ## 感谢
 * 本项目基于若依的前后端分离版，感谢ruoyi-vue
